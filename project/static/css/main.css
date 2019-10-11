@@ -1,0 +1,52 @@
+
+body {
+    padding-top: 56px;
+}
+
+.form-rounded {
+    border-radius: 1rem;
+}
+
+.alert.success {
+    background-color: green;
+}
+
+.alert.error {
+    background-color: red;
+}
+
+.btn-circle.btn-xl {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.33;
+}
+
+.page-item .page-link{
+    border-radius: 50% !important;
+    background: #fff;
+    margin: 10px;
+    cursor: pointer;
+    color: #28a745;
+}
+
+.page-item.active .page-link {
+    z-index: 1;
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 0px 0px;
+    border-radius: 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+}
+

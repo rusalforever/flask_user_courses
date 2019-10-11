@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container-fluid">
+    <br>
+    <div class="row">
+        <div class="col-md-3 offset-md-1 text-right">
+            <a href={{ url_for('user_course.users') }}>
+                <button class="btn btn-danger" type="button" style="border-radius: 25px; border: 5px;"
+                        id="back-btn"><i class="fa fa-chevron-left"></i></button>
+            </a>
+        </div>
+        <div class="col-md-4 text-center">
+            <h3>CREATE USER</h3>
+        </div>
+        <div class="col-md-2">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div>
+                            <a href={{ url_for('user_course.users') }}>
+                                <button class="btn alert {{ category }}" style="border-radius: 25px; border: 5px;"
+                                        id="flash-btn-{{ category }}">{{ message }}</button>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    <br>
+
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <form action="{{ url_for('user_course.user_create') }}" method="POST">
+                {% for field in form %}
+                    {% if field.type in ('HiddenField', 'CSRFTokenField') %}
+                        {{ field() }}
+                    {% elif field.type == 'SubmitField' %}
+                        <div class="text-right">
+                            {{ field(class_="btn btn-success form-rounded") }}
+                        </div>
+                    {% else %}
+                        <div class="form-group">
+                            {% if field.flags.required %}
+                                <span class="text-danger">*</span>
+                            {% endif %}
+                            {{ field.label(class='control-label') }}
+                            {{ field(class = 'form-control form-rounded' ) }}
+                            {% if field.errors %}
+                                <span class="text-danger">
+                                <ul class="alert errors">
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+    <script>
+        $("document").ready(function () {
+            setTimeout(function () {
+                $("#flash-btn-success").click();
+            }, 3000);
+        });
+    </script>
+
+{% endblock %}

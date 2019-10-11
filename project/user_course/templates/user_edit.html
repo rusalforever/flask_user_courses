@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %} User Edit {% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <br>
+        <div class="row">
+            <div class="col-md-3 offset-md-1 text-right">
+                <a href={{ url_for('user_course.users') }}>
+                    <button class="btn btn-danger" type="button" style="border-radius: 25px; border: 5px;"
+                            id="back-btn"><i class="fa fa-chevron-left"></i></button>
+                </a>
+            </div>
+            <div class="col-md-4 text-center">
+                <h3>CHANGE USER</h3>
+            </div>
+            <div class="col-md-2">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div>
+                                <a href={{ url_for('user_course.users') }}>
+                                    <button type="button" class="btn alert {{ category }}"
+                                            style="border-radius: 25px; border: 5px;"
+                                            id="flash-btn-{{ category }}">{{ message }}</button>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        <br>
+
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <form action="{{ url_for('user_course.user_edit', user_id=user_id) }}" method="POST">
+                    {% for field in form %}
+                        {% if field.type in ('HiddenField', 'CSRFTokenField') %}
+                            {{ field() }}
+                        {% elif field.type == 'SubmitField' %}
+
+                        {% else %}
+                            <div class="form-group">
+                                {% if field.flags.required %}
+                                    <span class="text-danger">*</span>
+                                {% endif %}
+                                {{ field.label(class='control-label') }}
+                                {{ field(class = 'form-control form-rounded' ) }}
+                                {% if field.errors %}
+                                    <span class="text-danger">
+                                <ul class="alert errors">
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                </span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <input type="hidden" id="user_courses" name="user_courses" value="{{ user_courses }}">
+                    <label class="control-label" for="sel_courses">Courses</label>
+                    <div class="courses_options row align-items-end">
+                        <div class="col-10 col-md-10" id="div_courses">
+                            <select class="form-control form-rounded" id="sel_courses" name="sel_courses">
+                                <option value="">Options..</option>
+                                {% for course_id, course_name in courses.items() %}
+                                    <option id="option_course_{{ course_id }}"
+                                            {% if course_id in user_courses %} hidden {% endif %}
+                                            value="{{ course_id }}">{{ course_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="ml-auto col-md-2 text-right">
+                            <button type="button" class="btn btn-success form-rounded"
+                                    id="add_course" name="add_course" type="button">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="div_courses" class="courses_container">
+                        {% for user_course in user_courses %}
+                            <div id="course_{{ user_course }}" class="row align-items-end">
+                                <div class="col-md-6">
+                                    <span>{{ courses[user_course] }}</span>
+                                </div>
+                                <div class="ml-auto text-right">
+                                    <button type="button" class="button_remove    btn btn-xs pull-right">
+                                        <i class="fa fa-close"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br><br>
+                    <div class="text-right">
+                        <input class="btn btn-success form-rounded" id="submit" name="submit" type="submit"
+                               value="Save">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        let user_courses = {{ user_courses|tojson }};
+        let sel_courses = $("#sel_courses");
+
+        function check_courses_count() {
+            if (user_courses.length >= 5) {
+                $('.courses_options').hide();
+            } else {
+                $('.courses_options').show();
+            }
+        };
+
+        function add_div(id, name) {
+            return (
+                `<div id="course_${id}" class="row align-items-end">
+                        <div class="col-md-6">
+                            <span>${name}</span>
+                        </div>
+                        <div class="ml-auto text-right">
+                            <button type="button" class="button_remove btn btn-xs pull-right">
+                                <i class="fa fa-close"></i>
+                            </button>
+                        </div>
+                    </div>`);
+        };
+
+        $("#add_course").click(function (event) {
+            let sel_courses = $("#sel_courses");
+            event.preventDefault();
+            if (sel_courses.is(":hidden")) {
+                sel_courses.show();
+            } else {
+                let selected_val = $('#sel_courses option:selected').val();
+                if (selected_val == '') {
+                    $('#sel_courses').focus();
+                } else {
+                    $('.courses_container').append(add_div(selected_val,
+                        $('#sel_courses option:selected').text()));
+                    $('#sel_courses option:selected').hide();
+                    $('#sel_courses').val('').change();
+                    user_courses.push(parseInt(selected_val));
+                    $('input[name=user_courses]').val(JSON.stringify(user_courses));
+                    check_courses_count();
+                }
+            }
+        });
+
+        $("document").ready(function () {
+            sel_courses.hide();
+            check_courses_count();
+
+            $("#name").attr("readonly","true");
+            $(document).on("click", ".button_remove", function (e) {
+                    e.preventDefault();
+                    let parent_id = $(this).parent().parent().attr('id');
+                    $('#option_' + parent_id).removeAttr("hidden");
+                    user_courses.splice($.inArray($('#option_' + parent_id).val(), user_courses), 1);
+                    $('#' + parent_id).remove();
+                    check_courses_count();
+                    $('input[name=user_courses]').val(JSON.stringify(user_courses));
+                }
+            );
+
+            $(window).keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            setTimeout(function () {
+                $("#flash-btn-success").click();
+            }, 3000);
+        });
+    </script>
+
+{% endblock %}

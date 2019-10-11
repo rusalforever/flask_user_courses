@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %} New User {% endblock %}
+{% block content %}
+    <div class="container">
+        <br>
+        <div class="row">
+            <div class="container-fluid">
+                <form class="form-inline" action="{{ url_for('user_course.users_filter') }}" method="POST">
+                    <div class="form-group col-md-1">
+                        <a href="{{ url_for('user_course.user_create') }}">
+                            <button class="btn btn-danger" type="button" style="border-radius: 25px; border: 5px;"
+                                    id="add-btn"><i class="fa fa-plus"></i></button>
+                        </a>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <div class="form-group"
+                             style="margin-right: -40px; z-index: 3; border-radius: 25px; background-color: transparent;
+                    border:none;">
+                            <button class="btn btn-success" type="submit" style="border-radius: 25px; border: 5px;"
+                                    id="search-btn"><i class="fa fa-search"></i></button>
+                        </div>
+                        <input class="form-control" type="text" id="search" name="search"
+                               placeholder="Search" value="{{ search }}" aria-label="Search"
+                               style="padding-left: 40px; border-radius: 25px; z-index: 0">
+                    </div>
+                    <div class="form-group col-md-3" style="text-align: right">
+                        <h3>USERS</h3>
+                    </div>
+                    <div class="form-group col-sm-3" style="text-align: right">
+                        <select name="per_page" name="per_page" class="form-rounded form-control" style="width:100px;">
+                            <option {% if per_page == 10 %}selected{% endif %}>10</option>
+                            <option {% if per_page == 15 %}selected{% endif %}>15</option>
+                            <option {% if per_page == 20 %}selected{% endif %}>20</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <br>
+        <div class="container-fluid">
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" style="width: 30%">Name</th>
+                    <th scope="col" style="width: 30%">E-mail</th>
+                    <th scope="col" style="width: 30%">Status</th>
+                    <th scope="col"
+                    ">Actions</th>
+                </tr>
+                </thead>
+                <tr>
+                    {% for user in user_list %}
+                        {% set user_id = user[0] -%}
+                        {% set is_active = user[3] == 1 %}
+                        <tr>
+                            <td>
+                                {{ user[1] }}
+                            </td>
+                            <td>
+                                {{ user[2] }}
+                            </td>
+                            <td class="text-{% if is_active %}success{% else %}danger{% endif %}">
+                                {% if is_active %}Active{% else %}Inactive{% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('user_course.user_edit', user_id=user_id) }}">
+                                    <button type="button" class="btn btn-success btn-circle"><i
+                                            class="fa fa-pencil-square-o"></i></i>
+                                    </button>
+                                </a>
+                                <a href="{{ url_for('user_course.user_delete', user_id=user_id) }}"
+                                    onclick="confirm('Are You sure?')">
+                                    <button type="button" class="btn btn-danger btn-circle"><i
+                                            class="fa fa-trash fa-sm"></i>
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-4">
+                {{ pagination.links }}
+            </div>
+        </div>
+
+{% endblock %}
